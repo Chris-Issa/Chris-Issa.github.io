@@ -57,7 +57,7 @@ body::after{
 }
 
 .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
-.band{padding:110px 0;position:relative}
+.band{padding-top:110px;padding-bottom:110px;position:relative}
 
 /* ============================================================
    TYPE ROLES
@@ -152,15 +152,18 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
   bottom:-90px;filter:blur(10px);
 }
 .hero-portrait{
-  position:relative;width:auto;max-height:460px;
+  position:absolute;left:50%;bottom:0;transform:translateX(-55%) translateY(46%);
+  height:720px;width:auto;max-width:none;
+  object-fit:cover;object-position:50% 15%;
   filter:grayscale(1) contrast(1.06) brightness(1.02);
-  -webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent 99%);
-  mask-image:linear-gradient(to bottom,#000 72%,transparent 99%);
+  -webkit-mask-image:linear-gradient(to bottom,#000 88%,transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 88%,transparent 100%);
 }
 /* Spec strip — the stats, set as gear-label data instead of a big-number bar */
 .spec{
   margin-top:66px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   display:grid;grid-template-columns:repeat(2,1fr);
+  position:relative;z-index:2;background:var(--ink);
 }
 .spec div{padding:20px 0;border-right:1px solid var(--line)}
 .spec div:nth-child(2n){border-right:0;padding-left:20px}
@@ -169,11 +172,6 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
 @media(min-width:860px){
   .hero{padding-top:96px}
   .hero-grid{grid-template-columns:1.15fr .85fr;gap:20px}
-  .spec{grid-template-columns:repeat(4,1fr)}
-  .spec div:nth-child(2n){border-right:1px solid var(--line);padding-left:0}
-  .spec div{padding-left:22px}
-  .spec div:first-child{padding-left:0}
-  .spec div:last-child{border-right:0}
 }
 
 /* ============================================================
@@ -240,6 +238,9 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
 .sleeve .wave i{display:block;width:3px;background:rgba(239,233,222,.26);border-radius:2px}
 .work:hover .wave i{background:var(--lamp)}
 .sleeve .wave i{transition:background .35s}
+.sleeve img.cover{width:100%;height:100%;object-fit:cover;display:block}
+.sleeve .cat{background:linear-gradient(180deg,rgba(0,0,0,.55),transparent);padding:6px 10px;border-radius:2px}
+.work-body audio{width:100%;margin-top:14px;color-scheme:dark;accent-color:var(--lamp)}
 .work-body{padding:20px}
 .work-body .rl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--lamp);margin-bottom:9px}
 .work-body h3{margin-bottom:8px}
@@ -267,10 +268,7 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
 .prose{columns:1;column-gap:44px}
 .prose p{font-size:15.5px;line-height:1.78;margin-bottom:16px;color:#3A342C;break-inside:avoid}
 .prose p.key{color:var(--paper-ink);font-weight:600}
-.prose p.first::first-letter{
-  font-family:var(--display);font-weight:800;float:left;font-size:56px;line-height:.82;
-  padding:6px 10px 0 0;color:var(--paper-ink);
-}
+
 .pull{
   font-family:var(--display);font-weight:800;font-size:22px;line-height:1.18;letter-spacing:-.03em;
   color:var(--paper-ink);border-left:2px solid var(--lamp);padding-left:16px;margin:26px 0;break-inside:avoid;
@@ -396,8 +394,6 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
     <div class="spec">
       <div><b>10+</b><span>Years in the industry</span></div>
       <div><b>100+</b><span>Projects delivered</span></div>
-      <div><b>4</b><span>Artists managed</span></div>
-      <div><b>4</b><span>Languages spoken</span></div>
     </div>
   </div>
 </header>
@@ -431,26 +427,26 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
         <i class="ti ti-adjustments-alt" aria-hidden="true"></i>
         <h3>Music production</h3>
         <p>From the first voice note to the final arrangement. I build the track around the song, not the other way round, and I keep pushing until it feels like you.</p>
-        <ul><li>Beats</li><li>Arrangement</li><li>Topline</li><li>Session players</li></ul>
+        <ul><li>Songwriting</li><li>Arrangement</li><li>Beats</li></ul>
       </article>
       <article class="svc">
         <i class="ti ti-wave-sine" aria-hidden="true"></i>
         <h3>Sound engineering</h3>
         <p>Recording and mixing in Logic Pro, with live and studio experience across genres. Every element earns its space, and the mix holds up on phone speakers and in the car.</p>
-        <ul><li>Recording</li><li>Mixing</li><li>Mastering</li><li>Live sound</li></ul>
+        <ul><li>Recording</li><li>Mixing</li><li>Mastering</li></ul>
       </article>
       <article class="svc">
         <i class="ti ti-route" aria-hidden="true"></i>
         <h3>Artist management</h3>
         <p>Release planning, bookings, industry relationships, and a second pair of eyes on every deal you are asked to sign. The parts that quietly eat your week.</p>
-        <ul><li>Strategy</li><li>Releases</li><li>Bookings</li><li>Deal review</li></ul>
+        <ul><li>Strategy</li><li>Releases</li><li>Distribution</li></ul>
       </article>
     </div>
   </div>
 </section>
 
 <!-- ============================================================
-     WORK — placeholder entries, ready to swap for real ones
+     WORK
 ============================================================ -->
 <section class="band" id="work" style="padding-top:0">
   <div class="wrap">
@@ -459,63 +455,61 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
       <h2>Projects worth hearing.</h2>
       <p class="lede">A cross section of production, engineering, and management work across independent artists and commercial projects.</p>
     </div>
-    <div class="work-grid rise">
+    
+<div class="work-grid rise">
 
-      <article class="work">
-        <div class="sleeve"><span class="cat">CI—001 &nbsp;·&nbsp; 2025</span><i class="ti ti-disc glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
-        <div class="work-body">
-          <div class="rl">Production · Mix</div>
-          <h3>Debut EP — [Artist name]</h3>
-          <p>Six tracks built from scratch with an emerging Arabic language artist. Out on every platform.</p>
-        </div>
-      </article>
-
-      <article class="work">
-        <div class="sleeve b"><span class="cat">CI—002 &nbsp;·&nbsp; 2025</span><i class="ti ti-microphone-2 glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
-        <div class="work-body">
-          <div class="rl">Live engineering</div>
-          <h3>[Festival or venue name]</h3>
-          <p>Head of sound for a multi act live night. Full technical ownership from load in to last song.</p>
-        </div>
-      </article>
-
-      <article class="work">
-        <div class="sleeve c"><span class="cat">CI—003 &nbsp;·&nbsp; 2024</span><i class="ti ti-chart-arrows glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
-        <div class="work-body">
-          <div class="rl">Management</div>
-          <h3>Career campaign — [Artist name]</h3>
-          <p>Ongoing management. Release calendar, booking coordination, and label outreach.</p>
-        </div>
-      </article>
-
-      <article class="work">
-        <div class="sleeve b"><span class="cat">CI—004 &nbsp;·&nbsp; 2024</span><i class="ti ti-vinyl glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
-        <div class="work-body">
-          <div class="rl">Single · Production</div>
-          <h3>[Single title]</h3>
-          <p>Written, produced, and mixed in one week for a deadline that would not move.</p>
-        </div>
-      </article>
-
-      <article class="work">
-        <div class="sleeve c"><span class="cat">CI—005 &nbsp;·&nbsp; 2023</span><i class="ti ti-headphones glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
-        <div class="work-body">
-          <div class="rl">Mix · Master</div>
-          <h3>[Album name]</h3>
-          <p>Mix and master for a full length record tracked across three cities.</p>
-        </div>
-      </article>
-
-      <article class="work">
-        <div class="sleeve"><span class="cat">CI—006 &nbsp;·&nbsp; 2023</span><i class="ti ti-device-tv glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
-        <div class="work-body">
-          <div class="rl">Sync · Commercial</div>
-          <h3>[Brand or campaign]</h3>
-          <p>Original score and sound design for a commercial spot, delivered in stems.</p>
-        </div>
-      </article>
-
+  <article class="work">
+    <div class="sleeve"><span class="cat">CI—001</span><img class="cover" src="media/peopleWeWorkWith/edleenIssa.jpg" alt="Edleen Issa" /></div>
+    <div class="work-body">
+      <div class="rl">Arrangement · Recording · Mix · Master</div>
+      <h3>Law Biwa'ata — Edleen Issa</h3>
+      <p>My mother came with the lyrics and the melody already in her head. I built the arrangement and mix around exactly what she wanted to hear.</p>
+      <audio controls preload="none" src="media/work/Edleen_Issa%20_-_Law_Biwaa'ta.wav"></audio>
     </div>
+  </article>
+
+  <article class="work">
+    <div class="sleeve b"><span class="cat">CI—002</span><img class="cover" src="media/peopleWeWorkWith/khalilGhadban.jpg" alt="Khalil Ghadban" /></div>
+    <div class="work-body">
+      <div class="rl">Production · Recording · Mix · Master</div>
+      <h3>Hubbi Elik Zay Flisteen — Khalil Ghadban</h3>
+      <p>Khalil showed up with lyrics and a melody. I shaped it into a finished track that matched his vision, and I've been his only producer since</p>
+      <audio controls preload="none" src="media/work/Khali_Ghadban%20_-_Hubbi_Elik_Zay_Flisteen.wav"></audio>
+    </div>
+  </article>
+
+  <article class="work">
+    <div class="sleeve c"><span class="cat">CI—003</span><img class="cover" src="media/peopleWeWorkWith/blu_penguin_march_26.jpg" alt="Blu Penguin" /></div>
+    <div class="work-body">
+      <div class="rl">Commercial · Production · Mix · Master</div>
+      <h3>Blu Penguin — Radio Ad</h3>
+      <p>Commissioned through the ad agency CDA for the local ice cream shop Blu Penguin, sung by Katem Bahouth and Sara El Raed. Their vision, my execution.</p>
+      <audio controls preload="none" src="media/work/Blu%20_Penguin_March_26.wav"></audio>
+    </div>
+  </article>
+
+  <article class="work">
+    <div class="sleeve"><span class="cat">CI—004</span><img class="cover" src="media/peopleWeWorkWith/placeholder.jpg" alt="Graduation song" /></div>
+    <div class="work-body">
+      <div class="rl">Songwriting · Composition · Production · Mix · Master</div>
+      <h3>Latin — Foj 30</h3>
+      <p>A graduating class with only a vibe and a reference track. I wrote the lyrics with them, composed the song, and took it through recording, mix, and master.</p>
+      <audio controls preload="none" src="media/work/Latin_Foj_30.wav"></audio>
+    </div>
+  </article>
+
+  <article class="work">
+    <div class="sleeve b"><span class="cat">CI—005</span><img class="cover" src="media/peopleWeWorkWith/placeholder.jpg" alt="Graduation song" /></div>
+    <div class="work-body">
+      <div class="rl">Songwriting · Composition · Production · Mix · Master</div>
+      <h3>Mutran — Foj 66</h3>
+      <p>Same tradition, a different class. I led them through the idea, co-wrote the lyrics, composed it, and carried it through to a finished master.</p>
+      <audio controls preload="none" src="media/work/Mutran_Foj_66.wav"></audio>
+    </div>
+  </article>
+
+</div>
+    
   </div>
 </section>
 
@@ -570,12 +564,6 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
       <p>When I was starting out, I needed someone in my corner. Someone who knew the path, or was at least honest enough to say, I don't know this part yet, but we'll figure it out together. I didn't have that. I think about that version of me a lot. Ideas and no direction, potential and no structure, hunger and nobody to channel it.</p>
       <p>I'm not here to take a percentage and disappear. I'm not here to tell you what you want to hear. I'm here to walk with you from wherever you are now to wherever the work deserves to go. Production, engineering, release, strategy, all of it. If I hit something I don't know yet, I'll tell you, and then I'll go learn it.</p>
       <p class="key">That's the only promise I can make, and it's the only one that matters.</p>
-    </div>
-
-    <div class="creds rise">
-      <div class="cred"><b>10+ years</b><span>In the music industry</span></div>
-      <div class="cred"><b>Technical University of Munich</b><span>B.Sc. Management &amp; Technology</span></div>
-      <div class="cred"><b>100+ projects</b><span>Production · Engineering · Management</span></div>
     </div>
   </div>
 </section>
@@ -791,12 +779,13 @@ document.querySelectorAll('.rise').forEach((el,i) => {
 ============================================================ */
 document.getElementById('send').addEventListener('click', () => {
   const v = id => document.getElementById(id).value.trim();
-  const subject = 'New project enquiry' + (v('f-svc') ? ' — ' + v('f-svc') : '');
+  const subject = (v('f-name') || 'Someone') + ' — New project enquiry' + (v('f-svc') ? ' · ' + v('f-svc') : '');
   const body =
     'Name: '    + (v('f-name') || '-') + '\n' +
     'Email: '   + (v('f-mail') || '-') + '\n' +
     'Service: ' + (v('f-svc')  || '-') + '\n\n' +
-    (v('f-msg') || '');
+    'Message:\n' +
+    (v('f-msg') || '-');
   window.location.href = 'mailto:management@weareequinox.com?subject='
     + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 });
