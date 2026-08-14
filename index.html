@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chris Issa — Producer, Sound Engineer, Artist Manager</title>
+<meta name="description" content="Producer, sound engineer and artist manager for independent artists. Idea to release, all under one roof. Munich and Nazareth." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<style>
+/* ============================================================
+   TOKENS
+   Warm graphite control room, amber lamp accent, paper insert.
+============================================================ */
+:root{
+  --ink:#12100E;
+  --panel:#1B1815;
+  --panel-2:#221E1A;
+  --line:#2F2A24;
+  --bone:#EFE9DE;
+  --dust:#9A928A;
+  --lamp:#E9A13B;
+  --lamp-soft:rgba(233,161,59,0.14);
+  --paper:#E9E3D7;
+  --paper-ink:#1A1714;
+
+  --display:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'Archivo',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+
+  --wrap:1120px;
+  --rail:78px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+body{
+  background:var(--ink);
+  color:var(--bone);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--lamp);outline-offset:3px;border-radius:2px}
+
+/* Film grain over everything */
+body::after{
+  content:"";position:fixed;inset:0;z-index:9;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+.band{padding:110px 0;position:relative}
+
+/* ============================================================
+   TYPE ROLES
+============================================================ */
+.mono{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dust);
+}
+.mono-lamp{color:var(--lamp)}
+h1,h2,h3,h4{font-family:var(--display);font-weight:800;letter-spacing:-.035em;line-height:.98}
+h1{font-size:clamp(40px,6.6vw,78px)}
+h2{font-size:clamp(32px,4.6vw,54px)}
+h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
+.lede{color:var(--dust);font-size:17px;max-width:56ch}
+
+.sec-head{margin-bottom:52px}
+.sec-head .mono{display:block;margin-bottom:18px}
+.sec-head h2{margin-bottom:16px}
+
+/* ============================================================
+   SIGNAL RAIL — the signature element.
+   A patch line down the left edge with a node per section.
+============================================================ */
+.rail{
+  position:fixed;left:26px;top:0;height:100vh;width:var(--rail);
+  z-index:8;display:none;pointer-events:none;
+}
+.rail-line{
+  position:absolute;left:5px;top:0;bottom:0;width:1px;background:var(--line);
+}
+.rail-fill{
+  position:absolute;left:5px;top:0;width:1px;height:0;
+  background:linear-gradient(180deg,var(--lamp),rgba(233,161,59,.25));
+}
+.rail-nodes{
+  position:absolute;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:26px;pointer-events:auto;
+}
+.node{display:flex;align-items:center;gap:12px;background:none;border:0;cursor:pointer;padding:0}
+.node-dot{
+  width:11px;height:11px;border-radius:50%;border:1px solid var(--line);
+  background:var(--ink);flex:none;transition:.3s;
+}
+.node-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dust);opacity:0;transform:translateX(-6px);transition:.3s;white-space:nowrap;
+}
+.node:hover .node-label,.node.on .node-label{opacity:1;transform:none}
+.node.on .node-dot{background:var(--lamp);border-color:var(--lamp);box-shadow:0 0 0 4px var(--lamp-soft)}
+@media(min-width:1240px){.rail{display:block}}
+
+/* ============================================================
+   NAV
+============================================================ */
+.nav{
+  position:sticky;top:0;z-index:20;height:62px;
+  background:rgba(18,16,14,.82);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.nav-in{max-width:var(--wrap);margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.03em}
+.brand span{color:var(--lamp)}
+.nav-links{display:none;gap:26px}
+.nav-links button{
+  background:none;border:0;cursor:pointer;font-family:var(--mono);font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dust);transition:color .2s;
+}
+.nav-links button:hover{color:var(--bone)}
+.btn{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  border-radius:2px;cursor:pointer;transition:.2s;border:1px solid transparent;
+}
+.btn-lamp{background:var(--lamp);color:#17130C;padding:11px 18px;font-weight:500}
+.btn-lamp:hover{background:#f3af4e}
+.btn-line{background:transparent;color:var(--bone);border-color:var(--line);padding:11px 18px}
+.btn-line:hover{border-color:var(--bone)}
+@media(min-width:920px){.nav-links{display:flex}}
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero{position:relative;overflow:hidden;padding:78px 0 0}
+.hero-grid{display:grid;gap:36px;align-items:end}
+.hero h1{margin:22px 0 24px}
+.hero h1 em{font-style:normal;color:var(--lamp);display:block}
+.hero-sub{color:var(--dust);font-size:17px;max-width:46ch;margin-bottom:32px}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.hero-media{position:relative;min-height:260px;display:flex;justify-content:center;align-items:flex-end}
+.hero-glow{
+  position:absolute;width:460px;height:460px;border-radius:50%;
+  background:radial-gradient(circle,rgba(233,161,59,.20),transparent 66%);
+  bottom:-90px;filter:blur(10px);
+}
+.hero-portrait{
+  position:relative;width:auto;max-height:460px;
+  filter:grayscale(1) contrast(1.06) brightness(1.02);
+  -webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent 99%);
+  mask-image:linear-gradient(to bottom,#000 72%,transparent 99%);
+}
+/* Spec strip — the stats, set as gear-label data instead of a big-number bar */
+.spec{
+  margin-top:66px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(2,1fr);
+}
+.spec div{padding:20px 0;border-right:1px solid var(--line)}
+.spec div:nth-child(2n){border-right:0;padding-left:20px}
+.spec b{font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-.03em;display:block;color:var(--bone)}
+.spec span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust)}
+@media(min-width:860px){
+  .hero{padding-top:96px}
+  .hero-grid{grid-template-columns:1.15fr .85fr;gap:20px}
+  .spec{grid-template-columns:repeat(4,1fr)}
+  .spec div:nth-child(2n){border-right:1px solid var(--line);padding-left:0}
+  .spec div{padding-left:22px}
+  .spec div:first-child{padding-left:0}
+  .spec div:last-child{border-right:0}
+}
+
+/* ============================================================
+   ROSTER MARQUEE
+============================================================ */
+.roster{padding:96px 0 0}
+.viewport{overflow:hidden;padding:34px 0 0;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
+.track{display:flex;gap:14px;will-change:transform}
+.card-artist{width:186px;flex:none}
+.card-artist .shot{
+  height:236px;border-radius:3px;overflow:hidden;background:var(--panel);
+  border:1px solid var(--line);position:relative;
+}
+.card-artist img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.86);transition:.5s}
+.card-artist:hover img{filter:grayscale(0) brightness(1);transform:scale(1.03)}
+.card-artist .nm{margin-top:12px;font-size:13px;font-weight:500}
+.card-artist .rl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust)}
+
+/* ============================================================
+   SERVICES
+============================================================ */
+.services{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.svc{background:var(--ink);padding:34px 28px;transition:background .35s}
+.svc:hover{background:var(--panel)}
+.svc i{font-size:22px;color:var(--lamp);display:block;margin-bottom:22px}
+.svc h3{margin-bottom:12px}
+.svc p{color:var(--dust);font-size:15px;margin-bottom:20px}
+.svc ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.svc li{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dust);border:1px solid var(--line);border-radius:2px;padding:4px 9px;
+}
+@media(min-width:860px){.services{grid-template-columns:repeat(3,1fr)}}
+
+/* ============================================================
+   WORK
+============================================================ */
+.work-grid{display:grid;gap:22px}
+.work{border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--panel);transition:.3s;cursor:pointer}
+.work:hover{border-color:#4A4139;transform:translateY(-3px)}
+.sleeve{
+  aspect-ratio:4/3;position:relative;display:flex;align-items:flex-end;padding:18px;
+  background:
+    radial-gradient(120% 90% at 78% 12%,rgba(233,161,59,.22),transparent 58%),
+    repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 1px,transparent 1px 9px),
+    linear-gradient(160deg,#241F1A,#131110);
+}
+.sleeve.b{background:
+    radial-gradient(120% 90% at 20% 82%,rgba(110,127,134,.30),transparent 60%),
+    repeating-linear-gradient(60deg,rgba(255,255,255,.03) 0 1px,transparent 1px 12px),
+    linear-gradient(200deg,#1E2124,#121112);}
+.sleeve.c{background:
+    radial-gradient(100% 100% at 50% 0%,rgba(233,161,59,.14),transparent 62%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 1px,transparent 1px 7px),
+    linear-gradient(180deg,#1C1916,#100F0E);}
+.sleeve .cat{
+  position:absolute;top:16px;left:18px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.16em;color:rgba(239,233,222,.5);
+}
+.sleeve .glyph{font-size:30px;color:rgba(239,233,222,.22)}
+.sleeve .wave{position:absolute;right:18px;bottom:18px;display:flex;align-items:flex-end;gap:4px;height:52px}
+.sleeve .wave i{display:block;width:3px;background:rgba(239,233,222,.26);border-radius:2px}
+.work:hover .wave i{background:var(--lamp)}
+.sleeve .wave i{transition:background .35s}
+.work-body{padding:20px}
+.work-body .rl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--lamp);margin-bottom:9px}
+.work-body h3{margin-bottom:8px}
+.work-body p{color:var(--dust);font-size:14px}
+@media(min-width:700px){.work-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.work-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ============================================================
+   PROOF / QUOTES
+============================================================ */
+.quotes{display:grid;gap:22px}
+.quote{border-top:1px solid var(--line);padding-top:24px}
+.quote p{font-family:var(--display);font-weight:400;font-size:19px;line-height:1.42;letter-spacing:-.02em;margin-bottom:18px}
+.quote .who{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust)}
+@media(min-width:860px){.quotes{grid-template-columns:repeat(3,1fr)}}
+
+/* ============================================================
+   ABOUT — inverted paper insert, like liner notes in a sleeve
+============================================================ */
+.insert{background:var(--paper);color:var(--paper-ink)}
+.insert .mono{color:#6B6357}
+.insert h2{color:var(--paper-ink)}
+.insert-head{border-bottom:1px solid rgba(26,23,20,.16);padding-bottom:26px;margin-bottom:34px;
+  display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-end}
+.prose{columns:1;column-gap:44px}
+.prose p{font-size:15.5px;line-height:1.78;margin-bottom:16px;color:#3A342C;break-inside:avoid}
+.prose p.key{color:var(--paper-ink);font-weight:600}
+.prose p.first::first-letter{
+  font-family:var(--display);font-weight:800;float:left;font-size:56px;line-height:.82;
+  padding:6px 10px 0 0;color:var(--paper-ink);
+}
+.pull{
+  font-family:var(--display);font-weight:800;font-size:22px;line-height:1.18;letter-spacing:-.03em;
+  color:var(--paper-ink);border-left:2px solid var(--lamp);padding-left:16px;margin:26px 0;break-inside:avoid;
+}
+.creds{display:grid;gap:1px;background:rgba(26,23,20,.14);border:1px solid rgba(26,23,20,.14);margin-top:38px;border-radius:3px;overflow:hidden}
+.cred{background:var(--paper);padding:18px 20px}
+.cred b{display:block;font-size:14px;font-weight:600;margin-bottom:3px}
+.cred span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6B6357}
+@media(min-width:860px){.prose{columns:2}.creds{grid-template-columns:repeat(3,1fr)}}
+
+/* ============================================================
+   PROCESS — a real sequence, so it gets numbered
+============================================================ */
+.steps{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.step{background:var(--ink);padding:30px 26px 30px 0}
+.step .num{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--lamp);margin-bottom:16px}
+.step h3{margin-bottom:10px}
+.step p{color:var(--dust);font-size:14px}
+@media(min-width:860px){.steps{grid-template-columns:repeat(4,1fr)}.step{padding:34px 24px}}
+
+/* ============================================================
+   CONTACT
+============================================================ */
+.contact{background:var(--panel);border-top:1px solid var(--line)}
+.contact-grid{display:grid;gap:44px}
+.contact h2{margin-bottom:16px}
+.contact h2 em{font-style:normal;color:var(--lamp)}
+.avail{display:inline-flex;align-items:center;gap:9px;margin-bottom:22px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--lamp);box-shadow:0 0 0 4px var(--lamp-soft)}
+.clinks{margin-top:30px;display:flex;flex-direction:column;gap:14px}
+.clink{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--bone)}
+.clink i{color:var(--lamp);font-size:16px}
+.form{background:var(--ink);border:1px solid var(--line);border-radius:3px;padding:26px}
+.field{margin-bottom:16px}
+.field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust);margin-bottom:8px}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:2px;
+  padding:12px 13px;font-size:14px;transition:border-color .2s;
+}
+.field textarea{min-height:112px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--lamp);outline:none}
+.field input::placeholder,.field textarea::placeholder{color:#6A635B}
+.form .btn-lamp{width:100%;padding:14px;border:0}
+.form-note{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#6A635B;margin-top:12px;text-align:center}
+@media(min-width:900px){.contact-grid{grid-template-columns:1fr 1fr;gap:70px;align-items:start}}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.foot{border-top:1px solid var(--line);padding:30px 0}
+.foot-in{max-width:var(--wrap);margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+.foot a{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust);transition:color .2s}
+.foot a:hover{color:var(--lamp)}
+.foot-links{display:flex;gap:20px}
+
+/* ============================================================
+   MOTION
+============================================================ */
+.rise{opacity:0;transform:translateY(16px)}
+.rise.in{opacity:1;transform:none;transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIGNAL RAIL — patch points down the left edge
+============================================================ -->
+<aside class="rail" aria-hidden="true">
+  <div class="rail-line"></div>
+  <div class="rail-fill" id="railFill"></div>
+  <div class="rail-nodes" id="railNodes">
+    <button class="node" data-go="roster"><span class="node-dot"></span><span class="node-label">Roster</span></button>
+    <button class="node" data-go="services"><span class="node-dot"></span><span class="node-label">Services</span></button>
+    <button class="node" data-go="work"><span class="node-dot"></span><span class="node-label">Work</span></button>
+    <button class="node" data-go="about"><span class="node-dot"></span><span class="node-label">About</span></button>
+    <button class="node" data-go="process"><span class="node-dot"></span><span class="node-label">Process</span></button>
+    <button class="node" data-go="contact"><span class="node-dot"></span><span class="node-label">Contact</span></button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav class="nav">
+  <div class="nav-in">
+    <div class="brand">Chris Issa<span>.</span></div>
+    <div class="nav-links">
+      <button data-go="services">Services</button>
+      <button data-go="work">Work</button>
+      <button data-go="about">About</button>
+      <button data-go="process">Process</button>
+    </div>
+    <button class="btn btn-lamp" data-go="contact">Start a project</button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="mono">Production &nbsp;/&nbsp; Engineering &nbsp;/&nbsp; Management</div>
+        <h1>You make music.<em>I handle the rest.</em></h1>
+        <p class="hero-sub">I work with independent artists who take the craft seriously and need someone in their corner who does the same. From the first idea to the day it lands on every platform.</p>
+        <div class="cta-row">
+          <button class="btn btn-lamp" data-go="contact">Start a project</button>
+          <button class="btn btn-line" data-go="work">Hear the work</button>
+        </div>
+      </div>
+      <div class="hero-media">
+        <div class="hero-glow"></div>
+        <img class="hero-portrait" src="media/greyChrisTransparent.png" alt="Chris Issa" onerror="this.style.display='none'" />
+      </div>
+    </div>
+
+    <div class="spec">
+      <div><b>10+</b><span>Years in the industry</span></div>
+      <div><b>100+</b><span>Projects delivered</span></div>
+      <div><b>4</b><span>Artists managed</span></div>
+      <div><b>4</b><span>Languages spoken</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     ROSTER
+============================================================ -->
+<section class="roster" id="roster">
+  <div class="wrap sec-head rise" style="margin-bottom:0">
+    <span class="mono">The roster</span>
+    <h2>The people behind the sound.</h2>
+    <p class="lede">Artists across genres, languages, and stages of a career. Some I produce. Some I manage. Some both.</p>
+  </div>
+  <div class="viewport">
+    <div class="track" id="track"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SERVICES
+============================================================ -->
+<section class="band" id="services">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <span class="mono">What I do</span>
+      <h2>Three disciplines. One standard.</h2>
+      <p class="lede">Cutting a debut EP, chasing a mix that finally translates, or trying to run the business side without losing the plot. I cover all three, so you are not stitching together three different people.</p>
+    </div>
+    <div class="services rise">
+      <article class="svc">
+        <i class="ti ti-adjustments-alt" aria-hidden="true"></i>
+        <h3>Music production</h3>
+        <p>From the first voice note to the final arrangement. I build the track around the song, not the other way round, and I keep pushing until it feels like you.</p>
+        <ul><li>Beats</li><li>Arrangement</li><li>Topline</li><li>Session players</li></ul>
+      </article>
+      <article class="svc">
+        <i class="ti ti-wave-sine" aria-hidden="true"></i>
+        <h3>Sound engineering</h3>
+        <p>Recording and mixing in Logic Pro, with live and studio experience across genres. Every element earns its space, and the mix holds up on phone speakers and in the car.</p>
+        <ul><li>Recording</li><li>Mixing</li><li>Mastering</li><li>Live sound</li></ul>
+      </article>
+      <article class="svc">
+        <i class="ti ti-route" aria-hidden="true"></i>
+        <h3>Artist management</h3>
+        <p>Release planning, bookings, industry relationships, and a second pair of eyes on every deal you are asked to sign. The parts that quietly eat your week.</p>
+        <ul><li>Strategy</li><li>Releases</li><li>Bookings</li><li>Deal review</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     WORK — placeholder entries, ready to swap for real ones
+============================================================ -->
+<section class="band" id="work" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <span class="mono">Selected work</span>
+      <h2>Projects worth hearing.</h2>
+      <p class="lede">A cross section of production, engineering, and management work across independent artists and commercial projects.</p>
+    </div>
+    <div class="work-grid rise">
+
+      <article class="work">
+        <div class="sleeve"><span class="cat">CI—001 &nbsp;·&nbsp; 2025</span><i class="ti ti-disc glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
+        <div class="work-body">
+          <div class="rl">Production · Mix</div>
+          <h3>Debut EP — [Artist name]</h3>
+          <p>Six tracks built from scratch with an emerging Arabic language artist. Out on every platform.</p>
+        </div>
+      </article>
+
+      <article class="work">
+        <div class="sleeve b"><span class="cat">CI—002 &nbsp;·&nbsp; 2025</span><i class="ti ti-microphone-2 glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
+        <div class="work-body">
+          <div class="rl">Live engineering</div>
+          <h3>[Festival or venue name]</h3>
+          <p>Head of sound for a multi act live night. Full technical ownership from load in to last song.</p>
+        </div>
+      </article>
+
+      <article class="work">
+        <div class="sleeve c"><span class="cat">CI—003 &nbsp;·&nbsp; 2024</span><i class="ti ti-chart-arrows glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
+        <div class="work-body">
+          <div class="rl">Management</div>
+          <h3>Career campaign — [Artist name]</h3>
+          <p>Ongoing management. Release calendar, booking coordination, and label outreach.</p>
+        </div>
+      </article>
+
+      <article class="work">
+        <div class="sleeve b"><span class="cat">CI—004 &nbsp;·&nbsp; 2024</span><i class="ti ti-vinyl glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
+        <div class="work-body">
+          <div class="rl">Single · Production</div>
+          <h3>[Single title]</h3>
+          <p>Written, produced, and mixed in one week for a deadline that would not move.</p>
+        </div>
+      </article>
+
+      <article class="work">
+        <div class="sleeve c"><span class="cat">CI—005 &nbsp;·&nbsp; 2023</span><i class="ti ti-headphones glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
+        <div class="work-body">
+          <div class="rl">Mix · Master</div>
+          <h3>[Album name]</h3>
+          <p>Mix and master for a full length record tracked across three cities.</p>
+        </div>
+      </article>
+
+      <article class="work">
+        <div class="sleeve"><span class="cat">CI—006 &nbsp;·&nbsp; 2023</span><i class="ti ti-device-tv glyph" aria-hidden="true"></i><span class="wave" aria-hidden="true"><i style="height:18%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:66%"></i><i style="height:50%"></i><i style="height:84%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:26%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:92%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:22%"></i><i style="height:70%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:30%"></i><i style="height:52%"></i></span></div>
+        <div class="work-body">
+          <div class="rl">Sync · Commercial</div>
+          <h3>[Brand or campaign]</h3>
+          <p>Original score and sound design for a commercial spot, delivered in stems.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROOF
+============================================================ -->
+<section class="band" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <span class="mono">In their words</span>
+      <h2>What working together feels like.</h2>
+    </div>
+    <div class="quotes rise">
+      <blockquote class="quote">
+        <p>“[Placeholder quote. Two or three lines about what changed once you came on board.]”</p>
+        <div class="who">[Name] · Artist</div>
+      </blockquote>
+      <blockquote class="quote">
+        <p>“[Placeholder quote. Something specific about the mix, the release, or the deadline.]”</p>
+        <div class="who">[Name] · Band</div>
+      </blockquote>
+      <blockquote class="quote">
+        <p>“[Placeholder quote. A line from a label, venue, or brand you have worked with.]”</p>
+        <div class="who">[Name] · Label</div>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT — paper insert, set like liner notes
+============================================================ -->
+<section class="insert" id="about">
+  <div class="wrap band">
+    <div class="insert-head rise">
+      <div>
+        <span class="mono">About</span>
+        <h2 style="margin-top:14px">My career started with a lie.</h2>
+      </div>
+      <span class="mono">Chris Issa · Producer, engineer, manager</span>
+    </div>
+
+    <div class="prose rise">
+      <p class="first">I didn't have a studio, gear, or clients. None of the things you're supposed to have. Just a laptop, some ideas, and a stranger who asked me if I knew a place to produce an album.</p>
+      <p class="key">I said, yes, me.</p>
+      <p>I had nothing. But I took the money, called my father, and told him we were building a studio, because that's the lie I'd just sold. 72 hours later, I didn't have to lie anymore. The studio existed.</p>
+      <p class="key">That's who I am.</p>
+      <p>Producer, sound engineer, artist manager. Everything I've built has been on the back of saying yes before I was ready, then figuring it out fast enough that nobody noticed.</p>
+      <p>Nobody taught me this industry. No mentor pulled me aside. No one handed me a roadmap or told me what to do when a client shows up with a dream and a deadline. I read the books. I watched the interviews. I listened to every podcast I could find. I learned the legal side, the business side, and the creative side, not because I wanted to, but because nobody else was going to do it for me.</p>
+      <p>Somewhere in the middle of all that, I realised something. The artist shouldn't have to carry any of this. They shouldn't be their own manager and their own lawyer and their own booking agent and their own marketing department. They shouldn't be drowning in the parts of the industry that have nothing to do with the music. That weight kills careers before they start, and I've watched it happen.</p>
+      <div class="pull">Every artist I work with is a chance to be the person I needed when I started.</div>
+      <p>When I was starting out, I needed someone in my corner. Someone who knew the path, or was at least honest enough to say, I don't know this part yet, but we'll figure it out together. I didn't have that. I think about that version of me a lot. Ideas and no direction, potential and no structure, hunger and nobody to channel it.</p>
+      <p>I'm not here to take a percentage and disappear. I'm not here to tell you what you want to hear. I'm here to walk with you from wherever you are now to wherever the work deserves to go. Production, engineering, release, strategy, all of it. If I hit something I don't know yet, I'll tell you, and then I'll go learn it.</p>
+      <p class="key">That's the only promise I can make, and it's the only one that matters.</p>
+    </div>
+
+    <div class="creds rise">
+      <div class="cred"><b>10+ years</b><span>In the music industry</span></div>
+      <div class="cred"><b>Technical University of Munich</b><span>B.Sc. Management &amp; Technology</span></div>
+      <div class="cred"><b>100+ projects</b><span>Production · Engineering · Management</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PROCESS — a real sequence, so the numbers earn their place
+============================================================ -->
+<section class="band" id="process">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <span class="mono">How it works</span>
+      <h2>Simple by design.</h2>
+      <p class="lede">Four steps from first message to finished record. No intake forms, no handoffs to strangers, no wondering who is actually doing the work.</p>
+    </div>
+    <div class="steps rise">
+      <div class="step">
+        <div class="num">01 · Intro call</div>
+        <h3>We talk</h3>
+        <p>The project, the artist, and what a win actually looks like for you. Thirty minutes, no charge.</p>
+      </div>
+      <div class="step">
+        <div class="num">02 · Scope</div>
+        <h3>You get a plan</h3>
+        <p>Clear deliverables, a timeline, and a price. One simple agreement and no surprises later.</p>
+      </div>
+      <div class="step">
+        <div class="num">03 · Build</div>
+        <h3>We make it</h3>
+        <p>Studio or remote. We build, refine, and keep iterating until the work is genuinely right.</p>
+      </div>
+      <div class="step">
+        <div class="num">04 · Release</div>
+        <h3>It goes out</h3>
+        <p>Final files, stems, and masters, or a full release plan if I'm managing the rollout.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT
+============================================================ -->
+<section class="contact" id="contact">
+  <div class="wrap band">
+    <div class="contact-grid">
+      <div class="rise">
+        <span class="mono">Get in touch</span>
+        <h2 style="margin-top:14px">Let's make <em>something real.</em></h2>
+        <div class="avail"><span class="dot"></span> Taking on new projects for autumn</div>
+        <p class="lede">Artist, label, or brand. If the work is serious, the conversation is worth having. Based in Munich, studio in Nazareth, working with people everywhere.</p>
+        <div class="clinks">
+          <a class="clink" href="mailto:management@weareequinox.com"><i class="ti ti-mail" aria-hidden="true"></i> management@weareequinox.com</a>
+          <a class="clink" href="https://instagram.com/chrisissa.wav" target="_blank" rel="noopener"><i class="ti ti-brand-instagram" aria-hidden="true"></i> @chrisissa.wav</a>
+          <div class="clink"><i class="ti ti-map-pin" aria-hidden="true"></i> Munich · Nazareth</div>
+        </div>
+      </div>
+
+      <div class="form rise">
+        <div class="field"><label for="f-name">Name</label><input id="f-name" type="text" placeholder="Your name" /></div>
+        <div class="field"><label for="f-mail">Email</label><input id="f-mail" type="email" placeholder="you@email.com" /></div>
+        <div class="field">
+          <label for="f-svc">What you need</label>
+          <select id="f-svc">
+            <option value="">Pick one</option>
+            <option>Music production</option>
+            <option>Sound engineering</option>
+            <option>Artist management</option>
+            <option>All of it</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field"><label for="f-msg">Message</label><textarea id="f-msg" placeholder="Genre, stage, timeline, and what you're trying to make."></textarea></div>
+        <button class="btn btn-lamp" id="send">Send message</button>
+        <div class="form-note">Opens your mail app · Reply within 48 hours</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="foot-in">
+    <div class="brand">Chris Issa<span>.</span></div>
+    <div class="foot-links">
+      <a href="https://instagram.com/chrisissa.wav" target="_blank" rel="noopener">Instagram</a>
+      <a href="#">SoundCloud</a>
+      <a href="#">LinkedIn</a>
+    </div>
+    <a href="mailto:management@weareequinox.com">© 2026 Chris Issa · Equinox</a>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ROSTER — edit this one list and the marquee rebuilds itself.
+   "role" is just the small label under the name.
+============================================================ */
+const ROSTER = [
+  {f:'aimanKhalil.jpg',   n:'Aiman Khalil',    r:'Artist'},
+  {f:'ameenKayouf.jpg',   n:'Ameen Kayouf',    r:'Artist'},
+  {f:'caramelBand.jpg',   n:'Caramel Band',    r:'Band'},
+  {f:'cda.jpg',           n:'CDA',             r:'Band'},
+  {f:'edleenIssa.jpg',    n:'Edleen Issa',     r:'Artist'},
+  {f:'khalilGhadban.jpg', n:'Khalil Ghadban',  r:'Artist'},
+  {f:'maenAlghoul.jpg',   n:'Maen Al Ghoul',   r:'Artist'},
+  {f:'moradKorabi.jpg',   n:'Morad Korabi',    r:'Artist'},
+  {f:'nasifFrancis.jpg',  n:'Nasif Francis',   r:'Artist'},
+  {f:'nourDarwish.jpg',   n:'Nour Darwish',    r:'Artist'},
+  {f:'ronzaMarshi.jpg',   n:'Ronza Marshi',    r:'Artist'},
+  {f:'shalabiYounis.jpg', n:'Shalabi Younis',  r:'Artist'},
+  {f:'yusorHamed.jpg',    n:'Yusor Hamed',     r:'Artist'},
+  {f:'zuheirFrancis.jpg', n:'Zuheir Francis',  r:'Artist'}
+];
+
+const track = document.getElementById('track');
+function cardHTML(a){
+  return '<figure class="card-artist">'
+    + '<div class="shot"><img src="media/peopleWeWorkWith/' + a.f + '" alt="' + a.n + '" loading="lazy" onerror="this.style.display=\'none\'" /></div>'
+    + '<figcaption><div class="nm">' + a.n + '</div><div class="rl">' + a.r + '</div></figcaption>'
+    + '</figure>';
+}
+track.innerHTML = ROSTER.map(cardHTML).join('') + ROSTER.map(cardHTML).join('');
+
+/* ============================================================
+   SMOOTH SCROLL
+============================================================ */
+const ease = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function goTo(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const nav = document.querySelector('.nav').offsetHeight;
+  const targetY = el.getBoundingClientRect().top + window.scrollY - nav - 12;
+  if(reduced){ window.scrollTo(0, targetY); return; }
+  const startY = window.scrollY, dist = targetY - startY;
+  const dur = Math.min(Math.max(Math.abs(dist)*.38, 480), 1100);
+  let t0 = null;
+  requestAnimationFrame(function step(ts){
+    if(!t0) t0 = ts;
+    const p = Math.min((ts - t0)/dur, 1);
+    window.scrollTo(0, startY + dist*ease(p));
+    if(p < 1) requestAnimationFrame(step);
+  });
+}
+document.querySelectorAll('[data-go]').forEach(b =>
+  b.addEventListener('click', () => goTo(b.dataset.go))
+);
+
+/* ============================================================
+   MARQUEE — eases to a stop on hover, resumes on leave
+============================================================ */
+(function(){
+  if(reduced) return;
+  let speed = 1, target = 1, pos = 0, last = null, half = 0;
+  const SPEED = 42; /* pixels per second */
+
+  function measure(){ half = track.scrollWidth / 2; }
+  window.addEventListener('load', measure);
+  window.addEventListener('resize', measure);
+  measure();
+
+  requestAnimationFrame(function tick(ts){
+    if(last === null) last = ts;
+    const dt = Math.min((ts - last)/1000, .05);
+    last = ts;
+    speed += (target - speed) * (1 - Math.pow(0.01, dt*2));
+    pos += SPEED * speed * dt;
+    if(half > 0 && pos >= half) pos -= half;
+    track.style.transform = 'translateX(' + (-pos) + 'px)';
+    requestAnimationFrame(tick);
+  });
+
+  track.addEventListener('mouseenter', () => target = 0);
+  track.addEventListener('mouseleave', () => target = 1);
+  track.addEventListener('focusin',   () => target = 0);
+  track.addEventListener('focusout',  () => target = 1);
+})();
+
+/* ============================================================
+   REVEAL ON SCROLL
+============================================================ */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rise').forEach((el,i) => {
+  el.style.transitionDelay = (i % 3) * 60 + 'ms';
+  io.observe(el);
+});
+
+/* ============================================================
+   SIGNAL RAIL — fill tracks scroll, node lights up per section
+============================================================ */
+(function(){
+  const fill  = document.getElementById('railFill');
+  const nodes = [...document.querySelectorAll('.node')];
+  const secs  = nodes.map(n => document.getElementById(n.dataset.go));
+
+  function update(){
+    const max = document.body.scrollHeight - window.innerHeight;
+    fill.style.height = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+    const mid = window.scrollY + window.innerHeight * .38;
+    let active = -1;
+    secs.forEach((s,i) => { if(s && s.offsetTop <= mid) active = i; });
+    nodes.forEach((n,i) => n.classList.toggle('on', i === active));
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', update);
+  update();
+})();
+
+/* ============================================================
+   CONTACT FORM — no backend, so it composes the email for you
+============================================================ */
+document.getElementById('send').addEventListener('click', () => {
+  const v = id => document.getElementById(id).value.trim();
+  const subject = 'New project enquiry' + (v('f-svc') ? ' — ' + v('f-svc') : '');
+  const body =
+    'Name: '    + (v('f-name') || '-') + '\n' +
+    'Email: '   + (v('f-mail') || '-') + '\n' +
+    'Service: ' + (v('f-svc')  || '-') + '\n\n' +
+    (v('f-msg') || '');
+  window.location.href = 'mailto:management@weareequinox.com?subject='
+    + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+});
+</script>
+</body>
+</html>
