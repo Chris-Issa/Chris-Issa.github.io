@@ -723,7 +723,9 @@ document.querySelectorAll('[data-go]').forEach(b =>
 (function(){
   if(reduced) return;
   let speed = 1, target = 1, pos = 0, last = null, half = 0;
+  let introTime = 0;
   const SPEED = 42; /* pixels per second */
+  const INTRO_DECAY = 2.2; /* higher settles faster */
 
   function measure(){ half = track.scrollWidth / 2; }
   window.addEventListener('load', measure);
@@ -734,12 +736,22 @@ document.querySelectorAll('[data-go]').forEach(b =>
     if(last === null) last = ts;
     const dt = Math.min((ts - last)/1000, .05);
     last = ts;
+    introTime += dt;
+    const introSpeed = 1 + (8 * Math.exp(-introTime * INTRO_DECAY));
     speed += (target - speed) * (1 - Math.pow(0.01, dt*2));
-    pos += SPEED * speed * dt;
+    pos += SPEED * speed * introSpeed * dt;
     if(half > 0 && pos >= half) pos -= half;
+    const blur = Math.min((introSpeed - 1) * 1.1, 9);
+    track.style.filter = blur > 0.15 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
     track.style.transform = 'translateX(' + (-pos) + 'px)';
     requestAnimationFrame(tick);
   });
+
+  track.addEventListener('mouseenter', () => target = 0);
+  track.addEventListener('mouseleave', () => target = 1);
+  track.addEventListener('focusin',   () => target = 0);
+  track.addEventListener('focusout',  () => target = 1);
+})();
 
   track.addEventListener('mouseenter', () => target = 0);
   track.addEventListener('mouseleave', () => target = 1);
