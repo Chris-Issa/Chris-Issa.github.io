@@ -725,7 +725,7 @@ document.querySelectorAll('[data-go]').forEach(b =>
   let speed = 1, target = 1, pos = 0, last = null, half = 0;
   let introTime = 0;
   const SPEED = 42; /* pixels per second */
-  const INTRO_DECAY = 2; /* higher settles faster */
+  const INTRO_DECAY = 1; /* higher settles faster */
 
   function measure(){ half = track.scrollWidth / 2; }
   window.addEventListener('load', measure);
@@ -737,7 +737,7 @@ document.querySelectorAll('[data-go]').forEach(b =>
     const dt = Math.min((ts - last)/1000, .05);
     last = ts;
     introTime += dt;
-    const introSpeed = 1 + (50 * Math.exp(-introTime * INTRO_DECAY));
+    const introSpeed = 1 + (500 * Math.exp(-introTime * INTRO_DECAY));
     speed += (target - speed) * (1 - Math.pow(0.01, dt*2));
     pos += SPEED * speed * introSpeed * dt;
     if(half > 0 && pos >= half) pos -= half;
