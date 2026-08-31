@@ -247,16 +247,18 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
 .sleeve .cat{background:linear-gradient(180deg,rgba(0,0,0,.55),transparent);padding:6px 10px;border-radius:2px}
 .work-body audio{width:100%;margin-top:auto;color-scheme:dark;accent-color:var(--lamp)}
 .work-body{padding:20px;display:flex;flex-direction:column;flex:1;min-height:0}
-.work-body .rl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--lamp);margin-bottom:9px}
-.work-body h3{margin-bottom:8px}
+.work-body .rl{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--lamp);
+  margin-bottom:9px;line-height:1.5;min-height:3em;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.work-body h3{
+  margin-bottom:8px;min-height:2.5em;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
 .work-body p{
-  color:var(--dust);
-  font-size:14px;
-  min-height:6.6em;
-  display:-webkit-box;
-  -webkit-line-clamp:4;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
+  color:var(--dust);font-size:14px;min-height:6.6em;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
 }
 @media(min-width:700px){.work-grid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:1000px){.work-grid{grid-template-columns:repeat(3,1fr)}}
@@ -264,11 +266,22 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
 /* ============================================================
    PROOF / QUOTES
 ============================================================ */
-.quotes{display:grid;gap:22px}
-.quote{border-top:1px solid var(--line);padding-top:24px}
-.quote p{font-family:var(--display);font-weight:400;font-size:19px;line-height:1.42;letter-spacing:-.02em;margin-bottom:18px}
-.quote .who{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust)}
-@media(min-width:860px){.quotes{grid-template-columns:repeat(3,1fr)}}
+.quote-stage{border-top:1px solid var(--line);padding-top:24px;max-width:68ch}
+.quote-track{position:relative}
+.quote-slide{
+  position:absolute;top:0;left:0;width:100%;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .5s ease;
+}
+.quote-slide.is-active{opacity:1;visibility:visible;pointer-events:auto}
+.quote-slide p{font-family:var(--display);font-weight:400;font-size:19px;line-height:1.42;letter-spacing:-.02em;margin-bottom:18px}
+.quote-slide .who{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust)}
+.quote-dots{display:flex;gap:8px;margin-top:22px}
+.quote-dots button{
+  width:8px;height:8px;border-radius:50%;border:1px solid var(--line);
+  background:transparent;padding:0;cursor:pointer;transition:.2s;
+}
+.quote-dots button.is-active{background:var(--lamp);border-color:var(--lamp)}
 
 /* ============================================================
    ABOUT — inverted paper insert, like liner notes in a sleeve
@@ -569,15 +582,18 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
       <span class="mono">In their words</span>
       <h2>What working together feels like.</h2>
     </div>
-    <div class="quotes rise">
-      <blockquote class="quote">
-        <p>“Chris is extremely helpful and professional in what he does. It’s always been a great experience working together.”</p>
-        <div class="who">Nasif Francis</div>
-      </blockquote>
-      <blockquote class="quote">
-        <p>“It’s always a pleasure to work with Chris. I am pretty new to this industry and Chris guided me through all of this. I couldn’t have wished for someone better!! 
-The whole production process is also great. He is incredibly talented, gives you a lot of creative freedom and also brings great ideas to the table. He’s also very honest and gives constructive feedback, but it never feels insulting or discouraging. He does everything to bring out the best out of the work. Working with Chris is always a pleasure, a lot of fun and the results are incredible!”</p>
-        <div class="who">Yiming</div>
+    <div class="quote-stage rise">
+      <div class="quote-track" id="quoteTrack">
+        <blockquote class="quote-slide is-active">
+          <p>“Chris is extremely helpful and professional in what he does. It’s always been a great experience working together.”</p>
+          <div class="who">Nasif Francis</div>
+        </blockquote>
+        <blockquote class="quote-slide">
+          <p>“It’s always a pleasure to work with Chris. I am pretty new to this industry and Chris guided me through all of this. I couldn’t have wished for someone better!! The whole production process is also great. He is incredibly talented, gives you a lot of creative freedom and also brings great ideas to the table. He’s also very honest and gives constructive feedback, but it never feels insulting or discouraging. He does everything to bring out the best out of the work. Working with Chris is always a pleasure, a lot of fun and the results are incredible!”</p>
+          <div class="who">Yiming</div>
+        </blockquote>
+      </div>
+      <div class="quote-dots" id="quoteDots"></div>
     </div>
   </div>
 </section>
@@ -801,6 +817,54 @@ document.querySelectorAll('.rise').forEach((el,i) => {
   io.observe(el);
 });
 
+/* ============================================================
+   TESTIMONIAL ROTATOR — one quote at a time, pauses on hover
+============================================================ */
+(function(){
+  const track = document.getElementById('quoteTrack');
+  const dotsWrap = document.getElementById('quoteDots');
+  if(!track || !dotsWrap) return;
+  const slides = [...track.querySelectorAll('.quote-slide')];
+  if(slides.length < 2) return;
+
+    let index = 0, timer = null;
+  const DURATION = 7000;
+
+  function measure(){
+    const tallest = Math.max(...slides.map(s => s.offsetHeight));
+    track.style.minHeight = tallest + 'px';
+  }
+  measure();
+  window.addEventListener('load', measure);
+  window.addEventListener('resize', measure);
+
+  slides.forEach((s, i) => {
+    const dot = document.createElement('button');
+    dot.setAttribute('aria-label', 'Show testimonial ' + (i + 1));
+    if(i === 0) dot.classList.add('is-active');
+    dot.addEventListener('click', () => { show(i); restart(); });
+    dotsWrap.appendChild(dot);
+  });
+  const dots = [...dotsWrap.children];
+
+  function show(i){
+    slides[index].classList.remove('is-active');
+    dots[index].classList.remove('is-active');
+    index = i;
+    slides[index].classList.add('is-active');
+    dots[index].classList.add('is-active');
+  }
+  function next(){ show((index + 1) % slides.length); }
+  function start(){ if(!reduced) timer = setInterval(next, DURATION); }
+  function stop(){ clearInterval(timer); }
+  function restart(){ stop(); start(); }
+
+  start();
+  track.addEventListener('mouseenter', stop);
+  track.addEventListener('mouseleave', start);
+  track.addEventListener('focusin', stop);
+  track.addEventListener('focusout', start);
+})();
 /* ============================================================
    SIGNAL RAIL — fill tracks scroll, node lights up per section
 ============================================================ */
