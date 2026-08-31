@@ -266,7 +266,8 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
 /* ============================================================
    PROOF / QUOTES
 ============================================================ */
-.quote-stage{border-top:1px solid var(--line);padding-top:24px;max-width:68ch}
+.quote-grid{display:grid;gap:36px}
+.quote-stage{border-top:1px solid var(--line);padding-top:24px}
 .quote-track{position:relative}
 .quote-slide{
   position:absolute;top:0;left:0;width:100%;
@@ -282,6 +283,13 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
   background:transparent;padding:0;cursor:pointer;transition:.2s;
 }
 .quote-dots button.is-active{background:var(--lamp);border-color:var(--lamp)}
+.quote-portrait{position:relative;aspect-ratio:3/4;border-radius:3px;overflow:hidden;border:1px solid var(--line);background:var(--panel);display:none}
+.quote-portrait-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05) brightness(.95);opacity:0;transition:opacity .5s ease}
+.quote-portrait-img.is-active{opacity:1}
+@media(min-width:860px){
+  .quote-grid{grid-template-columns:1.3fr .7fr;align-items:start;gap:60px}
+  .quote-portrait{display:block}
+}
 
 /* ============================================================
    ABOUT — inverted paper insert, like liner notes in a sleeve
@@ -582,18 +590,24 @@ h3{font-size:20px;letter-spacing:-.02em;line-height:1.2}
       <span class="mono">In their words</span>
       <h2>What working together feels like.</h2>
     </div>
-    <div class="quote-stage rise">
-      <div class="quote-track" id="quoteTrack">
-        <blockquote class="quote-slide is-active">
-          <p>“Chris is extremely helpful and professional in what he does. It’s always been a great experience working together.”</p>
-          <div class="who">Nasif Francis</div>
-        </blockquote>
-        <blockquote class="quote-slide">
-          <p>“It’s always a pleasure to work with Chris. I am pretty new to this industry and Chris guided me through all of this. I couldn’t have wished for someone better!! The whole production process is also great. He is incredibly talented, gives you a lot of creative freedom and also brings great ideas to the table. He’s also very honest and gives constructive feedback, but it never feels insulting or discouraging. He does everything to bring out the best out of the work. Working with Chris is always a pleasure, a lot of fun and the results are incredible!”</p>
-          <div class="who">Yiming</div>
-        </blockquote>
+    <div class="quote-grid rise">
+      <div class="quote-stage">
+        <div class="quote-track" id="quoteTrack">
+          <blockquote class="quote-slide is-active">
+            <p>“Chris is extremely helpful and professional in what he does. It’s always been a great experience working together.”</p>
+            <div class="who">Nasif Francis</div>
+          </blockquote>
+          <blockquote class="quote-slide">
+            <p>“It’s always a pleasure to work with Chris. I am pretty new to this industry and Chris guided me through all of this. I couldn’t have wished for someone better!! The whole production process is also great. He is incredibly talented, gives you a lot of creative freedom and also brings great ideas to the table. He’s also very honest and gives constructive feedback, but it never feels insulting or discouraging. He does everything to bring out the best out of the work. Working with Chris is always a pleasure, a lot of fun and the results are incredible!”</p>
+            <div class="who">Yiming</div>
+          </blockquote>
+        </div>
+        <div class="quote-dots" id="quoteDots"></div>
       </div>
-      <div class="quote-dots" id="quoteDots"></div>
+      <div class="quote-portrait" id="quotePortrait">
+        <img class="quote-portrait-img is-active" src="media/peopleWeWorkWith/nasifFrancis.jpg" alt="Nasif Francis" />
+        <img class="quote-portrait-img" src="media/peopleWeWorkWith/YimingTang.jpg" alt="Yiming" />
+      </div>
     </div>
   </div>
 </section>
@@ -821,10 +835,12 @@ document.querySelectorAll('.rise').forEach((el,i) => {
    TESTIMONIAL ROTATOR — one quote at a time, pauses on hover
 ============================================================ */
 (function(){
-  const track = document.getElementById('quoteTrack');
+    const track = document.getElementById('quoteTrack');
   const dotsWrap = document.getElementById('quoteDots');
+  const portraitWrap = document.getElementById('quotePortrait');
   if(!track || !dotsWrap) return;
   const slides = [...track.querySelectorAll('.quote-slide')];
+  const portraits = portraitWrap ? [...portraitWrap.querySelectorAll('.quote-portrait-img')] : [];
   if(slides.length < 2) return;
 
     let index = 0, timer = null;
@@ -847,12 +863,14 @@ document.querySelectorAll('.rise').forEach((el,i) => {
   });
   const dots = [...dotsWrap.children];
 
-  function show(i){
+    function show(i){
     slides[index].classList.remove('is-active');
     dots[index].classList.remove('is-active');
+    if(portraits[index]) portraits[index].classList.remove('is-active');
     index = i;
     slides[index].classList.add('is-active');
     dots[index].classList.add('is-active');
+    if(portraits[index]) portraits[index].classList.add('is-active');
   }
   function next(){ show((index + 1) % slides.length); }
   function start(){ if(!reduced) timer = setInterval(next, DURATION); }
